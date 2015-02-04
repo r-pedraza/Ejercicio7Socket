@@ -3,16 +3,19 @@ package ejer7Socket;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
 
 public class Servidor {
 	// Arranque servidor
 	public static void main(String args[]) {
 		ServerSocket servidor;
 		Socket conexion;
-		DataOutputStream salida;
-		DataInputStream entrada;
+		ObjectInputStream input=null;
+		ObjectOutputStream output = null;
 		int num = 0;
 
 		try {
@@ -26,18 +29,17 @@ public class Servidor {
 				System.out.println("Conexión número" + num + " desde: "
 						+ conexion.getInetAddress().getHostName());
 				// Abrimos los canales de entrada y salida
-				entrada = new DataInputStream(conexion.getInputStream());
-				salida = new DataOutputStream(conexion.getOutputStream());
+				input = new ObjectInputStream(new DataInputStream(conexion.getInputStream()));
+				output = new ObjectOutputStream(new DataOutputStream(conexion.getOutputStream()));
 				// Leemos el mensaje del cliente
-				String mensaje = entrada.readUTF();
-				int num1 = entrada.readInt();
+				String mensaje = input.readUTF();
+				int num1 = input.readInt();
 				System.out.println("Conexión n." + num + " mensaje: "
 						+ mensaje);
 				// Le respondemos al cliente
-				salida.writeUTF("Buenos días " + mensaje
+				output.writeUTF("Buenos días " + mensaje
 						+ "  numeros primos de ");
-      				salida.writeInt(primo(num1));
-				
+				output.writeObject(primo(num1));
 				// Se cierra la conexión
 				conexion.close();
 			}
@@ -45,16 +47,16 @@ public class Servidor {
 		}
 	}
 
-	public static int  primo(int num1) {
-
+	public static ArrayList<Integer> primo(int num1) {
+		ArrayList<Integer> array=new ArrayList<>();
 		for (int i = 1; i < num1; i++) {
-
 			if (esPrimo(i)) {
-				System.out.println("Numero primo: " + i);
-				
+				array.add(i);
+			} else {
 			}
 		}
-		return num1;
+		return array;
+
 	}
 
 	public static boolean esPrimo(int numero) {
